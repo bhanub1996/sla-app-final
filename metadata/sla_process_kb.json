@@ -1,0 +1,229 @@
+[
+  {
+    "kb_id": "KB_RAW_FILE_DELAY_001",
+    "process": "raw_file_arrival"    "process": "raw_file_arrival",
+    ],
+    "likely_root_causes": [
+      "Upstream source extract job delayed",
+      "File transfer latency from source system",
+      "Source system API throttling",
+      "Object storage write delay",
+      "Source batch dependency not completed"
+    ],
+    "mitigations": [
+      "Trigger upstream source job rerun",
+      "Check landing zone file arrival logs",
+      "Validate file naming convention and partition path",
+      "Enable file arrival alerting",
+      "Temporarily process previous available partition if business approved"
+    ],
+    "resources_to_check": [
+      "source scheduler",
+      "landing zone volume",
+      "file arrival audit table",
+      "upstream source logs"
+    ],
+    "escalation_team": "Source Data Engineering Team"
+  },
+  {
+    "kb_id": "KB_BRONZE_INGESTION_001",
+    "process": "bronze_ingestion",
+    "resource": "databricks_job_cluster",
+    "symptoms": [
+      "bronze ingestion slow",
+      "csv read delay",
+      "autoloader backlog",
+      "high file count",
+      "schema inference slow"
+    ],
+    "likely_root_causes": [
+      "Too many small files in raw volume",
+      "Schema inference overhead",
+      "Cluster under-provisioned",
+      "Checkpoint contention",
+      "Malformed CSV rows increasing parse time"
+    ],
+    "mitigations": [
+      "Use explicit schema instead of inferSchema",
+      "Compact incoming files upstream",
+      "Scale job cluster workers",
+      "Use Auto Loader with schema location and checkpoint",
+      "Quarantine malformed records"
+    ],
+    "resources_to_check": [
+      "Databricks cluster metrics",
+      "raw Unity Catalog volume",
+      "Auto Loader checkpoint",
+      "Spark read stage metrics"
+    ],
+    "escalation_team": "Lakehouse Platform Team"
+  },
+  {
+    "kb_id": "KB_SILVER_TRANSFORMATION_001",
+    "process": "silver_transformation",
+    "resource": "spark_shuffle_and_cluster_capacity",
+    "symptoms": [
+      "silver transformation slow",
+      "shuffle skew",
+      "long running spark stage",
+      "deduplication slow",
+      "merge operation slow"
+    ],
+    "likely_root_causes": [
+      "Skewed keys during deduplication",
+      "Large Delta merge with insufficient partition pruning",
+      "Unoptimized Bronze table layout",
+      "Cluster has insufficient executors",
+      "Data type casting failures causing retries"
+    ],
+    "mitigations": [
+      "Optimize Bronze tables before Silver merge",
+      "Add partition pruning by hour_key",
+      "Use ZORDER on sku and hour_key",
+      "Increase cluster workers",
+      "Investigate Spark UI for skewed tasks",
+      "Split large merge by partition"
+    ],
+    "resources_to_check": [
+      "Spark UI",
+      "Delta table history",
+      "cluster executor metrics",
+      "Silver merge query plan"
+    ],
+    "escalation_team": "Data Engineering Team"
+  },
+  {
+    "kb_id": "KB_STOCK_RECON_001",
+    "process": "stock_reconciliation",
+    "resource": "inventory_source_api",
+    "symptoms": [
+      "stock reconciliation slow",
+      "inventory API timeout",
+      "stock movement mismatch",
+      "closing stock negative",
+      "delayed inventory extract"
+    ],
+    "likely_root_causes": [
+      "Inventory API latency",
+      "Late stock adjustment events",
+      "Restock schedule not available",
+      "Inventory source table locked",
+      "Mismatch between orders and inventory event timestamps"
+    ],
+    "mitigations": [
+      "Retry inventory API call",
+      "Use last-known stock snapshot with warning flag",
+      "Reconcile only impacted SKUs",
+      "Escalate to inventory platform team",
+      "Reduce dependency scope for non-critical SKUs"
+    ],
+    "resources_to_check": [
+      "inventory API logs",
+      "stock movement table",
+      "restock schedule table",
+      "SKU-level reconciliation output"
+    ],
+    "escalation_team": "Inventory Platform Team"
+  },
+  {
+    "kb_id": "KB_GOLD_AGG_001",
+    "process": "gold_aggregation",
+    "resource": "delta_gold_tables",
+    "symptoms": [
+      "gold aggregation delayed",
+      "dashboard table not refreshed",
+      "kpi table stale",
+      "gold write slow"
+    ],
+    "likely_root_causes": [
+      "Silver input incomplete",
+      "Delta write conflict",
+      "Gold table not optimized",
+      "SQL warehouse or cluster resource contention",
+      "Concurrent dashboard refresh reading same tables"
+    ],
+    "mitigations": [
+      "Validate Silver table freshness",
+      "Retry Gold aggregation",
+      "Optimize and vacuum Gold tables",
+      "Check Delta transaction history",
+      "Temporarily increase cluster size"
+    ],
+    "resources_to_check": [
+      "Gold Delta tables",
+      "Delta transaction log",
+      "cluster metrics",
+      "dashboard refresh job"
+    ],
+    "escalation_team": "Analytics Engineering Team"
+  },
+  {
+    "kb_id": "KB_DASHBOARD_REFRESH_001",
+    "process": "dashboard_refresh",
+    "resource": "sql_warehouse",
+    "symptoms": [
+      "dashboard refresh delayed",
+      "sql warehouse queued",
+      "dashboard query timeout",
+      "kpi widget stale"
+    ],
+    "likely_root_causes": [
+      "SQL warehouse overloaded",
+      "Long running dashboard query",
+      "Gold table not optimized",
+      "Concurrent users causing queueing",
+      "Dashboard query scans too much history"
+    ],
+    "mitigations": [
+      "Scale SQL warehouse",
+      "Limit dashboard queries to latest partition",
+      "Create materialized Gold summary tables",
+      "Optimize Gold tables",
+      "Reduce dashboard refresh frequency temporarily"
+    ],
+    "resources_to_check": [
+      "SQL warehouse monitoring",
+      "query history",
+      "dashboard dataset query",
+      "Gold table layout"
+    ],
+    "escalation_team": "BI Platform Team"
+  },
+  {
+    "kb_id": "KB_CAMPAIGN_JOIN_001",
+    "process": "campaign_metrics_join",
+    "resource": "campaign_metrics_source",
+    "symptoms": [
+      "campaign metrics join slow",
+      "marketing performance delayed",
+      "paid media data late",
+      "roas calculation delayed"
+    ],
+    "likely_root_causes": [
+      "Campaign platform extract delayed",
+      "Large join without broadcast optimization",
+      "Missing campaign dimension keys",
+      "Source API throttling",
+      "Late-arriving campaign spend data"
+    ],
+    "mitigations": [
+      "Use previous-hour campaign spend as fallback",
+      "Broadcast small campaign dimension table",
+      "Retry campaign extract",
+      "Process top priority channels first",
+      "Flag ROAS as provisional until source catches up"
+    ],
+    "resources_to_check": [
+      "campaign source API",
+      "campaign spend table",
+      "Spark join plan",
+      "channel performance table"
+    ],
+    "escalation_team": "Marketing Data Platform Team"
+  }
+]
+    "resource": "source_system_or_landing_zone",
+    "symptoms": [
+      "source file arrived late",
+      "data availability time delayed",
+      "landing zone file missing",
