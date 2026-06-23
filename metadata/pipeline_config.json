@@ -1,0 +1,20 @@
+{
+  "app_name": "ecommerce_hypermarketing",
+  "layers": {
+    "bronze_schema_suffix": "bronze",
+    "silver_schema_suffix": "silver",
+    "gold_schema_suffix": "gold",
+    "ops_schema_suffix": "ops"
+  },
+  "volume_names": {
+    "raw": "ecommerce_raw",
+    "checkpoint": "ecommerce_checkpoint",
+    "schema": "ecommerce_schema"
+  },
+  "business_rules": {
+    "stock_low_hrs": 12.0,
+    "min_push_roas": 5.0,
+    "min_push_cvr": 4.5,
+    "profit_margin_threshold": 45.0
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "global": {
+    "non_negative_numeric": [
+      "sessions",
+      "clicks",
+      "orders",
+      "units_sold",
+      "gross_revenue",
+      "ad_spend",
+      "closing_stock",
+      "opening_stock"
+    ]
+  },
+  "tables": {
+    "dim_product": {
+      "not_null": [
+        "sku",
+        "product_name",
+        "category"
+      ],
+      "unique_key": [
+        "sku"
+      ]
+    },
+    "fact_marketing_performance_hourly": {
+      "not_null": [
+        "hour_key",
+        "sku",
+        "timestamp"
+      ],
+      "unique_key": [
+        "hour_key",
+        "sku"
+      ]
+    },
+    "fact_stock_movement_hourly": {
+      "not_null": [
+        "hour_key",
+        "sku",
+        "timestamp"
+      ],
+      "unique_key": [
+        "hour_key",
+        "sku"
+      ]
+    },
+    "fact_order_transactions": {
+      "not_null": [
+        "order_id",
+        "order_timestamp",
+        "sku"
+      ],
+      "unique_key": [
+        "order_id"
+      ]
+    }
+  }
+}

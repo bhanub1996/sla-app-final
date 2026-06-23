@@ -1,0 +1,48 @@
+resources:
+  jobs:
+    ecommerce_hypermarketing_hourly_etl:
+      name: ecommerce_hypermarketing_hourly_etl_${bundle.target}
+      description: Databricks-standard medallion ETL for e-commerce dynamic hyper-marketing dashboard
+      schedule:
+        quartz_cron_expression: "0 0 * * * ?"
+        timezone_id: ${var.timezone}
+        pause_status: PAUSED
+      job_clusters:
+        - job_cluster_key: etl_cluster
+          new_cluster:
+            spark_version: ${var.spark_version}
+            node_type_id: ${var.node_type_id}
+            num_workers: 2
+            data_security_mode: SINGLE_USER
+            spark_conf:
+              spark.databricks.delta.schema.autoMerge.enabled: "true"
+      tasks:
+        - task_key: setup_uc_objects
+          job_cluster_key: etl_cluster
+          spark_python_task:
+            python_file: ../src/ecommerce_hypermarketing/etl/00_setup_uc_objects.py
+            parameters: [--catalog, ${var.catalog}, --schema-prefix, ${var.schema_prefix}]
+        - task_key: ingest_bronze
+          depends_on: [{task_key: setup_uc_objects}]
+          job_cluster_key: etl_cluster
+          spark_python_task:
+            python_file: ../src/ecommerce_hypermarketing/etl/01_ingest_bronze.py
+            parameters: [--catalog, ${var.catalog}, --schema-prefix, ${var.schema_prefix}, --mode, batch]
+        - task_key: build_silver
+          depends_on: [{task_key: ingest_bronze}]
+          job_cluster_key: etl_cluster
+          spark_python_task:
+            python_file: ../src/ecommerce_hypermarketing/etl/02_build_silver.py
+            parameters: [--catalog, ${var.catalog}, --schema-prefix, ${var.schema_prefix}]
+        - task_key: build_gold
+          depends_on: [{task_key: build_silver}]
+          job_cluster_key: etl_cluster
+          spark_python_task:
+            python_file: ../src/ecommerce_hypermarketing/etl/03_build_gold.py
+            parameters: [--catalog, ${var.catalog}, --schema-prefix, ${var.schema_prefix}]
+        - task_key: optimize_tables
+          depends_on: [{task_key: build_gold}]
+          job_cluster_key: etl_cluster
+          spark_python_task:
+            python_file: ../src/ecommerce_hypermarketing/maintenance/04_optimize_tables.py
+            parameters: [--catalog, ${var.catalog}, --schema-prefix, ${var.schema_prefix}]

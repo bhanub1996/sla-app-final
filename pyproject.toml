@@ -1,0 +1,8 @@
+[project]
+name = "sla-app-ecommerce-hypermarketing-databricks"
+version = "1.0.0"
+description = "Databricks medallion ETL and dashboard package for dynamic e-commerce hyper-marketing"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["src"]

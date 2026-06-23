@@ -1,0 +1,222 @@
+{
+  "product_master": {
+    "layer": "silver",
+    "source_file": "product_master.csv",
+    "target": "dim_product",
+    "primary_keys": [
+      "sku"
+    ],
+    "partition_by": [],
+    "zorder_by": [
+      "sku",
+      "category"
+    ],
+    "columns": {
+      "sku": "string",
+      "product_name": "string",
+      "category": "string",
+      "brand": "string",
+      "unit_price": "decimal(12,2)",
+      "margin_pct": "decimal(6,2)",
+      "base_stock": "int",
+      "initial_stock_cover_hrs": "decimal(8,2)"
+    }
+  },
+  "marketing_performance_hourly": {
+    "layer": "silver",
+    "source_file": "marketing_performance_hourly.csv",
+    "target": "fact_marketing_performance_hourly",
+    "primary_keys": [
+      "hour_key",
+      "sku"
+    ],
+    "partition_by": [
+      "hour_key"
+    ],
+    "zorder_by": [
+      "sku",
+      "category",
+      "timestamp"
+    ],
+    "columns": {
+      "timestamp": "timestamp",
+      "hour_key": "string",
+      "sku": "string",
+      "product_name": "string",
+      "category": "string",
+      "sessions": "int",
+      "clicks": "int",
+      "ctr_pct": "decimal(8,2)",
+      "orders": "int",
+      "units_sold": "int",
+      "cvr_pct": "decimal(8,2)",
+      "gross_revenue": "decimal(14,2)",
+      "ad_spend": "decimal(14,2)",
+      "roas": "decimal(8,2)",
+      "demand_index": "decimal(8,2)",
+      "demand_spike_pct": "decimal(8,2)",
+      "discount_pct": "decimal(6,2)",
+      "avg_dwell_time_sec": "int",
+      "push_score": "decimal(8,2)"
+    }
+  },
+  "stock_movement_hourly": {
+    "layer": "silver",
+    "source_file": "stock_movement_hourly.csv",
+    "target": "fact_stock_movement_hourly",
+    "primary_keys": [
+      "hour_key",
+      "sku"
+    ],
+    "partition_by": [
+      "hour_key"
+    ],
+    "zorder_by": [
+      "sku",
+      "stock_risk_flag"
+    ],
+    "columns": {
+      "timestamp": "timestamp",
+      "hour_key": "string",
+      "sku": "string",
+      "product_name": "string",
+      "category": "string",
+      "opening_stock": "int",
+      "units_sold": "int",
+      "restocked_units": "int",
+      "closing_stock": "int",
+      "stock_cover_hrs": "decimal(8,2)",
+      "stock_risk_flag": "string"
+    }
+  },
+  "order_transactions": {
+    "layer": "silver",
+    "source_file": "order_transactions_sample.csv",
+    "target": "fact_order_transactions",
+    "primary_keys": [
+      "order_id"
+    ],
+    "partition_by": [
+      "category"
+    ],
+    "zorder_by": [
+      "sku",
+      "order_timestamp",
+      "traffic_channel"
+    ],
+    "columns": {
+      "order_id": "string",
+      "order_timestamp": "timestamp",
+      "sku": "string",
+      "product_name": "string",
+      "category": "string",
+      "quantity": "int",
+      "order_value": "decimal(14,2)",
+      "discount_pct": "decimal(6,2)",
+      "traffic_channel": "string",
+      "city": "string",
+      "customer_type": "string",
+      "payment_mode": "string"
+    }
+  },
+  "orders_hourly_summary": {
+    "layer": "silver",
+    "source_file": "orders_hourly_summary.csv",
+    "target": "fact_orders_hourly_summary",
+    "primary_keys": [
+      "hour_key"
+    ],
+    "partition_by": [
+      "hour_key"
+    ],
+    "zorder_by": [
+      "timestamp"
+    ],
+    "columns": {
+      "timestamp": "timestamp",
+      "hour_key": "string",
+      "total_orders": "int",
+      "total_units": "int",
+      "total_sessions": "int",
+      "revenue": "decimal(14,2)",
+      "ad_spend": "decimal(14,2)",
+      "conversion_rate_pct": "decimal(8,2)",
+      "aov": "decimal(12,2)"
+    }
+  },
+  "category_performance_hourly": {
+    "layer": "silver",
+    "source_file": "category_performance_hourly.csv",
+    "target": "fact_category_performance_hourly",
+    "primary_keys": [
+      "hour_key",
+      "category"
+    ],
+    "partition_by": [
+      "hour_key"
+    ],
+    "zorder_by": [
+      "category"
+    ],
+    "columns": {
+      "timestamp": "timestamp",
+      "hour_key": "string",
+      "category": "string",
+      "sessions": "int",
+      "orders": "int",
+      "revenue": "decimal(14,2)",
+      "ad_spend": "decimal(14,2)",
+      "avg_demand_spike_pct": "decimal(8,2)",
+      "avg_push_score": "decimal(8,2)",
+      "cvr_pct": "decimal(8,2)",
+      "roas": "decimal(8,2)"
+    }
+  },
+  "channel_performance_hourly": {
+    "layer": "silver",
+    "source_file": "channel_performance_hourly.csv",
+    "target": "fact_channel_performance_hourly",
+    "primary_keys": [
+      "hour_key",
+      "channel"
+    ],
+    "partition_by": [
+      "hour_key"
+    ],
+    "zorder_by": [
+      "channel"
+    ],
+    "columns": {
+      "timestamp": "timestamp",
+      "hour_key": "string",
+      "channel": "string",
+      "sessions": "int",
+      "orders": "int",
+      "revenue": "decimal(14,2)",
+      "ad_spend": "decimal(14,2)",
+      "cvr_pct": "decimal(8,2)",
+      "roas": "decimal(8,2)"
+    }
+  },
+  "restock_schedule": {
+    "layer": "silver",
+    "source_file": "restock_schedule.csv",
+    "target": "fact_restock_schedule",
+    "primary_keys": [
+      "sku",
+      "scheduled_restock_timestamp"
+    ],
+    "partition_by": [],
+    "zorder_by": [
+      "sku",
+      "scheduled_restock_timestamp"
+    ],
+    "columns": {
+      "sku": "string",
+      "product_name": "string",
+      "scheduled_restock_timestamp": "timestamp",
+      "restock_units": "int",
+      "status": "string"
+    }
+  }
+}
