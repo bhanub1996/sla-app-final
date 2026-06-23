@@ -1,0 +1,85 @@
+[
+  {
+    "batch_id": "BATCH_ECOM_PRODUCT_MASTER",
+    "business_domain": "Ecommerce",
+    "criticality": "MEDIUM",
+    "expected_data_available_minute": 5,
+    "sla_offset_minutes": 45,
+    "owner_team": "Product Data Engineering",
+    "escalation_team": "Lakehouse Platform Team",
+    "active_flag": true,
+    "processes": [
+      "raw_file_arrival",
+      "bronze_ingestion",
+      "silver_transformation"
+    ]
+  },
+  {
+    "batch_id": "BATCH_ECOM_MARKETING_PERFORMANCE",
+    "business_domain": "Ecommerce",
+    "criticality": "HIGH",
+    "expected_data_available_minute": 10,
+    "sla_offset_minutes": 60,
+    "owner_team": "Marketing Data Engineering",
+    "escalation_team": "Marketing Data Platform Team",
+    "active_flag": true,
+    "processes": [
+      "raw_file_arrival",
+      "bronze_ingestion",
+      "campaign_metrics_join",
+      "silver_transformation",
+      "gold_budget_shift"
+    ]
+  },
+  {
+    "batch_id": "BATCH_ECOM_STOCK_MOVEMENT",
+    "business_domain": "Ecommerce",
+    "criticality": "HIGH",
+    "expected_data_available_minute": 8,
+    "sla_offset_minutes": 60,
+    "owner_team": "Inventory Data Engineering",
+    "escalation_team": "Inventory Platform Team",
+    "active_flag": true,
+    "processes": [
+      "raw_file_arrival",
+      "bronze_ingestion",
+      "stock_reconciliation",
+      "silver_transformation",
+      "gold_pushnow_scoring"
+    ]
+  },
+  {
+    "batch_id": "BATCH_ECOM_ORDERS_HOURLY",
+    "business_domain": "Ecommerce",
+    "criticality": "HIGH",
+    "expected_data_available_minute": 6,
+    "sla_offset_minutes": 60,
+    "owner_team": "Orders Data Engineering",
+    "escalation_team": "Data Engineering Team",
+    "active_flag": true,
+    "processes": [
+      "raw_file_arrival",
+      "bronze_ingestion",
+      "silver_transformation",
+      "gold_aggregation",
+      "dashboard_refresh"
+    ]
+  },
+  {
+    "batch_id": "BATCH_ECOM_CATEGORY_PERFORMANCE",
+    "business_domain": "Ecommerce",
+    "criticality": "MEDIUM",
+    "expected_data_available_minute": 12,
+    "sla_offset_minutes": 65,
+    "owner_team": "Analytics Engineering",
+    "escalation_team": "Analytics Engineering Team",
+    "active_flag": true,
+    "processes": [
+      "raw_file_arrival",
+      "bronze_ingestion",
+      "silver_transformation",
+      "gold_aggregation",
+      "dashboard_refresh"
+    ]
+  }
+]
