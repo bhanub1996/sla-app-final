@@ -40,6 +40,16 @@ resources:
           spark_python_task:
             python_file: ../src/ecommerce_hypermarketing/etl/03_build_gold.py
             parameters: [--catalog, ${var.catalog}, --schema-prefix, ${var.schema_prefix}]
+        - task_key: monitor_sla_and_trigger_agent
+          depends_on:
+           .py            - task_key: build_gold
+            parameters:
+              - --catalog
+              - ${var.catalog}
+              - --schema-prefix
+              - ${var.schema_prefix}
+          job_cluster_key: etl_cluster
+          spark_python_task:
         - task_key: optimize_tables
           depends_on: [{task_key: build_gold}]
           job_cluster_key: etl_cluster
