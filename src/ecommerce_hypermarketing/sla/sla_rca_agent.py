@@ -1,5 +1,47 @@
 from ecommerce_hypermarketing.sla.sla_vector_kb import text_to_vector, cosine_similarity
+# sla-app-final/src/ecommerce_hypermarketing/sla/sla_rca_agent.py
+from .sla_config import SLAConfig
 
+class SLARCAAgent:
+    def __init__(self):
+        self.client = SLAConfig.get_llm_client()
+        self.model = SLAConfig.MODEL_NAME
+        self.temperature = SLAConfig.TEMPERATURE
+
+    def generate_rca(self, telemetry_data: dict, retrieved_context: str) -> str:
+        system_prompt = (
+            "You are an expert E-commerce Data Operations Agent specializing in Databricks Lakehouse architecture.\n"
+            "Your objective is to evaluate current operational telemetry data against historical reference knowledge "
+            "to formulate a structured Root Cause Analysis (RCA) and outline immediate, actionable mitigation steps."
+        )
+        
+        user_prompt = f"""
+        ### OPERATIONAL TELEMETRY ANOMALY:
+        - Target Table: {telemetry_data.get('table_name', 'Unknown')}
+        - Observed Ingestion Latency: {telemetry_data.get('latency_minutes', 0)} minutes
+        - SLA Threshold Limit: {telemetry_data.get('sla_threshold', 0)} minutes
+        - Status: {telemetry_data.get('status', 'CRITICAL')}
+        
+        ### RETRIEVED KNOWLEDGE BASE CONTEXT (RAG):
+        {retrieved_context}
+        
+        ### INSTRUCTIONS:
+        Based on the telemetry data and retrieved context provided above, generate a professional RCA including:
+        1. **Root Cause Analysis**: Why this delay happened.
+        2. **Impact Score**: A value from 1 to 10 evaluating impact on hyper-marketing push rankings.
+        3. **Actionable Mitigation Plans**: Step-by-step commands or steps to recover the pipeline (e.g., table optimization, cluster changes).
+        """
+
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=self.temperature
+        )
+        
+        return response.choices[0].message.content
 
 def retrieve_kb_matches(event_payload, vector_kb, top_k=3):
     query_parts = [
