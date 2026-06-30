@@ -17,6 +17,46 @@ from pyspark.sql.types import (
     DoubleType
 )
 
+# COMMAND ----------
+# MAGIC %pip install openai --upgrade
+
+# COMMAND ----------
+# Ensure your repository src directory is appended to sys path for modular imports
+import sys
+import os
+sys.path.append(os.path.abspath("/Workspace/Repos/bhanub1996/sla-app-final/src"))
+
+# Import your newly structured RAG modules
+from ecommerce_hypermarketing.sla.sla_vector_kb import SLAVectorKB
+from ecommerce_hypermarketing.sla.sla_rca_agent import SLARCAAgent
+
+# COMMAND ----------
+# 1. Simulate pulling an active anomaly row from your 'sla_ops' metadata table
+active_anomaly = {
+    "table_name": "marketing_performance_hourly",
+    "latency_minutes": 75,
+    "sla_threshold": 45,
+    "status": "SLA_BREACH_RISK",
+    "error_summary": "Delay in processing marketing pipeline channel streams"
+}
+
+print(f"🔍 Monitoring Loop: Detected risk on table '{active_anomaly['table_name']}'...")
+
+# 2. Execute the RETRIEVAL stage (RAG Context Fetch)
+kb = SLAVectorKB()
+context = kb.retrieve_context(active_anomaly['error_summary'])
+
+print("📖 Context retrieved successfully from local Knowledge Base.")
+
+# 3. Execute the GENERATION stage (LLM Inference via ngrok)
+agent = SLARCAAgent()
+rca_report = agent.generate_rca(telemetry_data=active_anomaly, retrieved_context=context)
+
+# 4. Display the comprehensive generated RCA report directly within Databricks
+print("-" * 60)
+print("🤖 AUTOMATED AGENTIC ROOT CAUSE ANALYSIS & MITIGATION REPORT:")
+print("-" * 60)
+display(rca_report)
 # Make imports robust for Workspace Python script task
 CURRENT_FILE = Path(__file__).resolve()
 SRC_ROOT = CURRENT_FILE.parents[2]
